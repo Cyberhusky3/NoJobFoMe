@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Keyboard Drum Machine</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --background: #10111f;
+      --panel: rgba(255, 255, 255, 0.08);
+      --panel-border: rgba(255, 255, 255, 0.18);
+      --text: #f7f7ff;
+      --muted: #b8bdd8;
+      --accent: #7c5cff;
+      --active: #21e6c1;
+      --shadow: rgba(0, 0, 0, 0.35);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      display: grid;
+      place-items: center;
+      padding: 2rem;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(124, 92, 255, 0.38), transparent 32rem),
+        radial-gradient(circle at bottom right, rgba(33, 230, 193, 0.22), transparent 28rem),
+        var(--background);
+    }
+
+    main {
+      width: min(980px, 100%);
+      text-align: center;
+    }
+
+    .hero {
+      margin-bottom: 2rem;
+    }
+
+    h1 {
+      margin: 0 0 0.75rem;
+      font-size: clamp(2rem, 6vw, 4.25rem);
+      letter-spacing: -0.06em;
+      line-height: 0.95;
+    }
+
+    .subtitle {
+      max-width: 660px;
+      margin: 0 auto;
+      color: var(--muted);
+      font-size: clamp(1rem, 2.5vw, 1.2rem);
+      line-height: 1.6;
+    }
+
+    .pad-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: clamp(0.9rem, 3vw, 1.4rem);
+    }
+
+    .drum-pad {
+      min-height: 170px;
+      border: 1px solid var(--panel-border);
+      border-radius: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.85rem;
+      padding: 1.25rem;
+      color: var(--text);
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.14), var(--panel));
+      box-shadow: 0 22px 50px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      cursor: pointer;
+      user-select: none;
+      transform: translateY(0) scale(1);
+      transition: transform 120ms ease, border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+    }
+
+    .drum-pad:hover,
+    .drum-pad:focus-visible {
+      border-color: rgba(255, 255, 255, 0.42);
+      outline: none;
+      transform: translateY(-4px) scale(1.01);
+    }
+
+    .drum-pad.active {
+      border-color: rgba(33, 230, 193, 0.9);
+      background: linear-gradient(145deg, rgba(33, 230, 193, 0.42), rgba(124, 92, 255, 0.28));
+      box-shadow: 0 0 0 6px rgba(33, 230, 193, 0.12), 0 28px 58px rgba(33, 230, 193, 0.18);
+      transform: translateY(3px) scale(0.97);
+    }
+
+    .key {
+      width: 74px;
+      height: 74px;
+      display: grid;
+      place-items: center;
+      border-radius: 22px;
+      font-size: 2rem;
+      font-weight: 900;
+      color: #151626;
+      background: linear-gradient(180deg, #ffffff, #dfe2ff);
+      box-shadow: inset 0 -6px 0 rgba(0, 0, 0, 0.12);
+    }
+
+    .sound-name {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+    }
+
+    .hint {
+      margin-top: 1.5rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    @media (max-width: 760px) {
+      body {
+        padding: 1rem;
+      }
+
+      .pad-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 460px) {
+      .pad-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .drum-pad {
+        min-height: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <section class="hero" aria-labelledby="page-title">
+      <h1 id="page-title">Keyboard Drum Machine</h1>
+      <p class="subtitle">Press A, S, D, F, G, or H to play synthesized drum sounds instantly. You can also click or tap the pads.</p>
+    </section>
+
+    <section class="pad-grid" aria-label="Drum pads">
+      <button class="drum-pad" type="button" data-key="a" data-sound="kick" aria-label="A Kick drum pad">
+        <span class="key">A</span>
+        <span class="sound-name">Kick</span>
+      </button>
+      <button class="drum-pad" type="button" data-key="s" data-sound="snare" aria-label="S Snare drum pad">
+        <span class="key">S</span>
+        <span class="sound-name">Snare</span>
+      </button>
+      <button class="drum-pad" type="button" data-key="d" data-sound="closedHat" aria-label="D Closed Hi-Hat drum pad">
+        <span class="key">D</span>
+        <span class="sound-name">Closed Hi-Hat</span>
+      </button>
+      <button class="drum-pad" type="button" data-key="f" data-sound="openHat" aria-label="F Open Hi-Hat drum pad">
+        <span class="key">F</span>
+        <span class="sound-name">Open Hi-Hat</span>
+      </button>
+      <button class="drum-pad" type="button" data-key="g" data-sound="tom" aria-label="G Tom drum pad">
+        <span class="key">G</span>
+        <span class="sound-name">Tom</span>
+      </button>
+      <button class="drum-pad" type="button" data-key="h" data-sound="clap" aria-label="H Clap drum pad">
+        <span class="key">H</span>
+        <span class="sound-name">Clap</span>
+      </button>
+    </section>
+
+    <p class="hint">Tip: keep this tab focused, then use your keyboard like a tiny drum kit.</p>
+  </main>
+
+  <script>
+    // Store one AudioContext for the whole app. The Web Audio API uses this object
+    // to create oscillators, filters, gain controls, and other audio building blocks.
+    let audioContext;
+
+    // Each keyboard key maps to a named synthesized drum voice.
+    const keyToSoundMap = {
+      a: 'kick',
+      s: 'snare',
+      d: 'closedHat',
+      f: 'openHat',
+      g: 'tom',
+      h: 'clap'
+    };
+
+    const pads = Array.from(document.querySelectorAll('.drum-pad'));
+
+    // Browser audio starts best after a user gesture. A key press or mouse click is
+    // a user gesture, so we create/resume the AudioContext inside the play path.
+    function getAudioContext() {
+      if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+      }
+
+      if (audioContext.state === 'suspended') {
+        audioContext.resume();
+      }
+
+      return audioContext;
+    }
+
+    // A gain node controls volume. This helper creates a short envelope so sounds
+    // start quickly and fade out naturally instead of clicking abruptly.
+    function createEnvelope(context, startTime, peakVolume, duration) {
+      const gainNode = context.createGain();
+      gainNode.gain.setValueAtTime(0.0001, startTime);
+      gainNode.gain.exponentialRampToValueAtTime(peakVolume, startTime + 0.01);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
+      gainNode.connect(context.destination);
+      return gainNode;
+    }
+
+    // White noise is useful for snares, hi-hats, and claps. We fill an audio buffer
+    // with random values between -1 and 1, then play it through filters/envelopes.
+    function createNoiseBuffer(context, duration) {
+      const sampleCount = context.sampleRate * duration;
+      const buffer = context.createBuffer(1, sampleCount, context.sampleRate);
+      const channelData = buffer.getChannelData(0);
+
+      for (let index = 0; index < sampleCount; index += 1) {
+        channelData[index] = Math.random() * 2 - 1;
+      }
+
+      return buffer;
+    }
+
+    function playKick(context, time) {
+      const oscillator = context.createOscillator();
+      const envelope = createEnvelope(context, time, 1, 0.55);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(150, time);
+      oscillator.frequency.exponentialRampToValueAtTime(45, time + 0.45);
+      oscillator.connect(envelope);
+      oscillator.start(time);
+      oscillator.stop(time + 0.55);
+    }
+
+    function playSnare(context, time) {
+      const noise = context.createBufferSource();
+      const noiseFilter = context.createBiquadFilter();
+      const noiseEnvelope = createEnvelope(context, time, 0.55, 0.2);
+      const snap = context.createOscillator();
+      const snapEnvelope = createEnvelope(context, time, 0.28, 0.12);
+
+      noise.buffer = createNoiseBuffer(context, 0.2);
+      noiseFilter.type = 'highpass';
+      noiseFilter.frequency.value = 900;
+      noise.connect(noiseFilter).connect(noiseEnvelope);
+
+      snap.type = 'triangle';
+      snap.frequency.setValueAtTime(190, time);
+      snap.frequency.exponentialRampToValueAtTime(120, time + 0.12);
+      snap.connect(snapEnvelope);
+
+      noise.start(time);
+      noise.stop(time + 0.2);
+      snap.start(time);
+      snap.stop(time + 0.12);
+    }
+
+    function playHiHat(context, time, isOpen) {
+      const noise = context.createBufferSource();
+      const highpass = context.createBiquadFilter();
+      const envelope = createEnvelope(context, time, isOpen ? 0.38 : 0.28, isOpen ? 0.65 : 0.09);
+
+      noise.buffer = createNoiseBuffer(context, isOpen ? 0.65 : 0.09);
+      highpass.type = 'highpass';
+      highpass.frequency.value = 6500;
+      noise.connect(highpass).connect(envelope);
+      noise.start(time);
+      noise.stop(time + (isOpen ? 0.65 : 0.09));
+    }
+
+    function playTom(context, time) {
+      const oscillator = context.createOscillator();
+      const envelope = createEnvelope(context, time, 0.75, 0.45);
+
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(210, time);
+      oscillator.frequency.exponentialRampToValueAtTime(85, time + 0.4);
+      oscillator.connect(envelope);
+      oscillator.start(time);
+      oscillator.stop(time + 0.45);
+    }
+
+    function playClap(context, time) {
+      // A clap sounds like several tiny bursts of filtered noise close together.
+      [0, 0.035, 0.07].forEach((offset) => {
+        const clapTime = time + offset;
+        const noise = context.createBufferSource();
+        const bandpass = context.createBiquadFilter();
+        const envelope = createEnvelope(context, clapTime, 0.35, 0.12);
+
+        noise.buffer = createNoiseBuffer(context, 0.12);
+        bandpass.type = 'bandpass';
+        bandpass.frequency.value = 1400;
+        bandpass.Q.value = 0.9;
+        noise.connect(bandpass).connect(envelope);
+        noise.start(clapTime);
+        noise.stop(clapTime + 0.12);
+      });
+    }
+
+    function playSound(soundName) {
+      const context = getAudioContext();
+      const now = context.currentTime;
+
+      if (soundName === 'kick') {
+        playKick(context, now);
+      } else if (soundName === 'snare') {
+        playSnare(context, now);
+      } else if (soundName === 'closedHat') {
+        playHiHat(context, now, false);
+      } else if (soundName === 'openHat') {
+        playHiHat(context, now, true);
+      } else if (soundName === 'tom') {
+        playTom(context, now);
+      } else if (soundName === 'clap') {
+        playClap(context, now);
+      }
+    }
+
+    function highlightPad(pad) {
+      pad.classList.remove('active');
+      // Restart the CSS animation/highlight even when the same key is hit rapidly.
+      void pad.offsetWidth;
+      pad.classList.add('active');
+      window.setTimeout(() => pad.classList.remove('active'), 130);
+    }
+
+    function triggerPadBySound(soundName) {
+      const pad = pads.find((drumPad) => drumPad.dataset.sound === soundName);
+
+      if (!pad) {
+        return;
+      }
+
+      playSound(soundName);
+      highlightPad(pad);
+    }
+
+    // Keyboard events let the drum machine respond immediately while the page has focus.
+    window.addEventListener('keydown', (event) => {
+      const pressedKey = event.key.toLowerCase();
+      const soundName = keyToSoundMap[pressedKey];
+
+      if (!soundName || event.repeat) {
+        return;
+      }
+
+      event.preventDefault();
+      triggerPadBySound(soundName);
+    });
+
+    // Mouse and touch users can also play by clicking/tapping the visible pads.
+    pads.forEach((pad) => {
+      pad.addEventListener('click', () => {
+        triggerPadBySound(pad.dataset.sound);
+      });
+    });
+  </script>
+</body>
+</html>
