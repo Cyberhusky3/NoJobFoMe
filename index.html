@@ -12,7 +12,6 @@
       --panel-border: rgba(255, 255, 255, 0.18);
       --text: #f7f7ff;
       --muted: #b8bdd8;
-      --accent: #7c5cff;
       --active: #21e6c1;
       --shadow: rgba(0, 0, 0, 0.35);
     }
@@ -63,6 +62,7 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: clamp(0.9rem, 3vw, 1.4rem);
+      align-items: stretch;
     }
 
     .drum-pad {
@@ -79,9 +79,41 @@
       background: linear-gradient(145deg, rgba(255, 255, 255, 0.14), var(--panel));
       box-shadow: 0 22px 50px var(--shadow), inset 0 1px 0 rgba(255, 255, 255, 0.12);
       cursor: pointer;
+      overflow: hidden;
+      position: relative;
       user-select: none;
       transform: translateY(0) scale(1);
       transition: transform 120ms ease, border-color 120ms ease, background 120ms ease, box-shadow 120ms ease;
+    }
+
+    .drum-pad:nth-child(1),
+    .drum-pad:nth-child(6) {
+      --pad-accent: rgba(124, 92, 255, 0.36);
+    }
+
+    .drum-pad:nth-child(2),
+    .drum-pad:nth-child(5) {
+      --pad-accent: rgba(33, 230, 193, 0.28);
+    }
+
+    .drum-pad:nth-child(3),
+    .drum-pad:nth-child(4) {
+      --pad-accent: rgba(255, 190, 87, 0.27);
+    }
+
+    .drum-pad::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: radial-gradient(circle at top, var(--pad-accent), transparent 68%);
+      opacity: 0.8;
+      pointer-events: none;
+    }
+
+    .drum-pad > * {
+      position: relative;
+      z-index: 1;
     }
 
     .drum-pad:hover,
@@ -185,6 +217,7 @@
     // Store one AudioContext for the whole app. The Web Audio API uses this object
     // to create oscillators, filters, gain controls, and other audio building blocks.
     let audioContext;
+    let masterOutput;
 
     // Each keyboard key maps to a named synthesized drum voice.
     const keyToSoundMap = {
@@ -203,6 +236,20 @@
     function getAudioContext() {
       if (!audioContext) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
+
+        // A gentle compressor and master gain keep the kit balanced when several
+        // drums are triggered quickly, preventing one sound from overpowering the mix.
+        const compressor = audioContext.createDynamicsCompressor();
+        compressor.threshold.value = -18;
+        compressor.knee.value = 24;
+        compressor.ratio.value = 4;
+        compressor.attack.value = 0.003;
+        compressor.release.value = 0.18;
+
+        const masterGain = audioContext.createGain();
+        masterGain.gain.value = 0.82;
+        compressor.connect(masterGain).connect(audioContext.destination);
+        masterOutput = compressor;
       }
 
       if (audioContext.state === 'suspended') {
@@ -219,7 +266,7 @@
       gainNode.gain.setValueAtTime(0.0001, startTime);
       gainNode.gain.exponentialRampToValueAtTime(peakVolume, startTime + 0.01);
       gainNode.gain.exponentialRampToValueAtTime(0.0001, startTime + duration);
-      gainNode.connect(context.destination);
+      gainNode.connect(masterOutput);
       return gainNode;
     }
 
@@ -239,24 +286,24 @@
 
     function playKick(context, time) {
       const oscillator = context.createOscillator();
-      const envelope = createEnvelope(context, time, 1, 0.55);
+      const envelope = createEnvelope(context, time, 0.8, 0.5);
 
       oscillator.type = 'sine';
-      oscillator.frequency.setValueAtTime(150, time);
-      oscillator.frequency.exponentialRampToValueAtTime(45, time + 0.45);
+      oscillator.frequency.setValueAtTime(135, time);
+      oscillator.frequency.exponentialRampToValueAtTime(48, time + 0.4);
       oscillator.connect(envelope);
       oscillator.start(time);
-      oscillator.stop(time + 0.55);
+      oscillator.stop(time + 0.5);
     }
 
     function playSnare(context, time) {
       const noise = context.createBufferSource();
       const noiseFilter = context.createBiquadFilter();
-      const noiseEnvelope = createEnvelope(context, time, 0.55, 0.2);
+      const noiseEnvelope = createEnvelope(context, time, 0.42, 0.18);
       const snap = context.createOscillator();
-      const snapEnvelope = createEnvelope(context, time, 0.28, 0.12);
+      const snapEnvelope = createEnvelope(context, time, 0.2, 0.1);
 
-      noise.buffer = createNoiseBuffer(context, 0.2);
+      noise.buffer = createNoiseBuffer(context, 0.18);
       noiseFilter.type = 'highpass';
       noiseFilter.frequency.value = 900;
       noise.connect(noiseFilter).connect(noiseEnvelope);
@@ -267,7 +314,7 @@
       snap.connect(snapEnvelope);
 
       noise.start(time);
-      noise.stop(time + 0.2);
+      noise.stop(time + 0.18);
       snap.start(time);
       snap.stop(time + 0.12);
     }
@@ -275,26 +322,26 @@
     function playHiHat(context, time, isOpen) {
       const noise = context.createBufferSource();
       const highpass = context.createBiquadFilter();
-      const envelope = createEnvelope(context, time, isOpen ? 0.38 : 0.28, isOpen ? 0.65 : 0.09);
+      const envelope = createEnvelope(context, time, isOpen ? 0.24 : 0.18, isOpen ? 0.55 : 0.075);
 
-      noise.buffer = createNoiseBuffer(context, isOpen ? 0.65 : 0.09);
+      noise.buffer = createNoiseBuffer(context, isOpen ? 0.55 : 0.075);
       highpass.type = 'highpass';
       highpass.frequency.value = 6500;
       noise.connect(highpass).connect(envelope);
       noise.start(time);
-      noise.stop(time + (isOpen ? 0.65 : 0.09));
+      noise.stop(time + (isOpen ? 0.55 : 0.075));
     }
 
     function playTom(context, time) {
       const oscillator = context.createOscillator();
-      const envelope = createEnvelope(context, time, 0.75, 0.45);
+      const envelope = createEnvelope(context, time, 0.48, 0.38);
 
       oscillator.type = 'sine';
       oscillator.frequency.setValueAtTime(210, time);
       oscillator.frequency.exponentialRampToValueAtTime(85, time + 0.4);
       oscillator.connect(envelope);
       oscillator.start(time);
-      oscillator.stop(time + 0.45);
+      oscillator.stop(time + 0.38);
     }
 
     function playClap(context, time) {
@@ -303,15 +350,15 @@
         const clapTime = time + offset;
         const noise = context.createBufferSource();
         const bandpass = context.createBiquadFilter();
-        const envelope = createEnvelope(context, clapTime, 0.35, 0.12);
+        const envelope = createEnvelope(context, clapTime, 0.24, 0.11);
 
-        noise.buffer = createNoiseBuffer(context, 0.12);
+        noise.buffer = createNoiseBuffer(context, 0.11);
         bandpass.type = 'bandpass';
         bandpass.frequency.value = 1400;
         bandpass.Q.value = 0.9;
         noise.connect(bandpass).connect(envelope);
         noise.start(clapTime);
-        noise.stop(clapTime + 0.12);
+        noise.stop(clapTime + 0.11);
       });
     }
 
