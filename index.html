@@ -286,7 +286,7 @@
 
     function playKick(context, time) {
       const oscillator = context.createOscillator();
-      const envelope = createEnvelope(context, time, 0.8, 0.5);
+      const envelope = createEnvelope(context, time, 1.05, 0.5);
 
       oscillator.type = 'sine';
       oscillator.frequency.setValueAtTime(135, time);
@@ -334,7 +334,7 @@
 
     function playTom(context, time) {
       const oscillator = context.createOscillator();
-      const envelope = createEnvelope(context, time, 0.48, 0.38);
+      const envelope = createEnvelope(context, time, 0.68, 0.38);
 
       oscillator.type = 'sine';
       oscillator.frequency.setValueAtTime(210, time);
