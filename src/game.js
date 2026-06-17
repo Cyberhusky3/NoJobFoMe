@@ -33,6 +33,25 @@ const ui = {
   finalScore: document.getElementById('finalScore'), finalTime: document.getElementById('finalTime'), characterCards: document.getElementById('characterCards')
 };
 
+const storage = {
+  memory: new Map(),
+  get(key, fallback) {
+    try {
+      return window.localStorage.getItem(key) ?? fallback;
+    } catch (error) {
+      return this.memory.get(key) ?? fallback;
+    }
+  },
+  set(key, value) {
+    try {
+      window.localStorage.setItem(key, String(value));
+    } catch (error) {
+      this.memory.set(key, String(value));
+    }
+  }
+};
+
+
 class SoundSystem {
   constructor() { this.context = null; }
   play(type) {
@@ -53,6 +72,16 @@ class SoundSystem {
 }
 
 class XPSystem {
+  constructor() { this.level = 1; this.xp = 0; this.unlockedLevel = Number(storage.get('nojfm_maxLevel', '1')); }
+  required() { return Math.floor(CONFIG.xp.baseRequired * Math.pow(CONFIG.xp.growth, this.level - 1)); }
+  add(amount, game) { this.xp += amount; while (this.xp >= this.required()) { this.xp -= this.required(); this.level++; this.unlockedLevel = Math.max(this.unlockedLevel, this.level); storage.set('nojfm_maxLevel', this.unlockedLevel); game.onLevelUp(); } }
+}
+
+class CharacterUnlockSystem {
+  constructor(xpSystem) { this.xpSystem = xpSystem; this.selectedId = storage.get('nojfm_character', 'soldier'); }
+  isUnlocked(character) { return this.xpSystem.unlockedLevel >= character.unlockLevel; }
+  selected() { return CHARACTERS.find(c => c.id === this.selectedId) || CHARACTERS[0]; }
+  select(id) { const character = CHARACTERS.find(c => c.id === id); if (character && this.isUnlocked(character)) { this.selectedId = id; storage.set('nojfm_character', id); } }
   constructor() { this.level = 1; this.xp = 0; this.unlockedLevel = Number(localStorage.getItem('nojfm_maxLevel') || 1); }
   required() { return Math.floor(CONFIG.xp.baseRequired * Math.pow(CONFIG.xp.growth, this.level - 1)); }
   add(amount, game) { this.xp += amount; while (this.xp >= this.required()) { this.xp -= this.required(); this.level++; this.unlockedLevel = Math.max(this.unlockedLevel, this.level); localStorage.setItem('nojfm_maxLevel', this.unlockedLevel); game.onLevelUp(); } }
