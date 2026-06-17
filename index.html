@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NoJobFoMe - Top-Down Shooter</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="gameCanvas" width="1280" height="720" aria-label="Top-down shooter game canvas"></canvas>
+
+      <section id="mainMenu" class="screen active">
+        <div class="panel wide">
+          <h1>NoJobFoMe Arena</h1>
+          <p class="subtitle">Survive escalating waves, earn XP, unlock heroes, and upgrade your weapon.</p>
+          <div class="menu-grid">
+            <button type="button" id="startButton" class="primary">Start Game</button>
+            <button type="button" id="characterButton">Character Select</button>
+          </div>
+          <div class="instructions">
+            <h2>How to Play</h2>
+            <ul>
+              <li><strong>Move:</strong> WASD or Arrow Keys</li>
+              <li><strong>Aim:</strong> Mouse cursor</li>
+              <li><strong>Shoot:</strong> Hold left mouse button</li>
+              <li><strong>Level up:</strong> Defeat enemies to gain XP and weapon upgrades</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="characterMenu" class="screen">
+        <div class="panel wide">
+          <h1>Character Select</h1>
+          <div id="characterCards" class="character-grid"></div>
+          <button type="button" id="backButton">Back</button>
+        </div>
+      </section>
+
+      <section id="hud" class="hud hidden">
+        <div class="bar-wrap"><span>HP</span><div class="bar"><div id="healthFill" class="fill health"></div></div><strong id="healthText">100 / 100</strong></div>
+        <div class="bar-wrap"><span>XP</span><div class="bar"><div id="xpFill" class="fill xp"></div></div><strong id="levelText">Level 1</strong></div>
+        <div class="stats"><span id="scoreText">Score: 0</span><span id="waveText">Wave: 1</span><span id="timeText">00:00</span><span id="upgradeText">Weapon: Basic</span></div>
+      </section>
+
+      <section id="gameOver" class="screen">
+        <div class="panel">
+          <h1>Game Over</h1>
+          <p id="finalScore">Score: 0</p>
+          <p id="finalTime">Survival Time: 00:00</p>
+          <button type="button" id="restartButton" class="primary">Restart</button>
+          <button type="button" id="menuButton">Main Menu</button>
+        </div>
+      </section>
+    </main>
+
+    <script src="src/game.js"></script>
+  </body>
+</html>
