@@ -1,34 +1,23 @@
-# NoJobFoMe Arena
+# FightFit AI
 
-A complete browser-based top-down shooter prototype built with vanilla HTML, CSS, and JavaScript.
+A production-ready MVP concept for a Duolingo-style martial arts and fitness onboarding app built with Next.js 15, TypeScript, Tailwind CSS, Framer Motion, localStorage persistence, and realistic mock data.
 
-## Features
-
-- WASD/arrow-key movement, mouse aiming, and hold-to-fire shooting.
-- Continuous enemy waves with basic, fast, and tank archetypes.
-- Difficulty scaling through larger enemy groups, increased health, and increased speed.
-- Health, healing pickups, XP, level progression, score, wave, and survival timer UI.
-- Character progression with persistent unlocks via `localStorage`:
-  - Starter Soldier: available immediately.
-  - Scout: unlocks at Level 3.
-  - Heavy Gunner: unlocks at Level 5.
-  - Medic: unlocks at Level 7.
-- Level-up weapon upgrades for fire rate, damage, and multi-shot.
-- Procedural Web Audio sound effects and canvas-based visual effects.
-
-## Running the Game
-
-Open `index.html` directly in a modern browser, or serve the folder locally:
+## Run locally
 
 ```bash
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-Then visit <http://localhost:8000>.
+Visit <http://localhost:3000>.
 
-## Controls
+## MVP features
 
-- Move: `WASD` or arrow keys
-- Aim: mouse
-- Shoot: hold left mouse button
-- Restart after defeat: use the Game Over screen button
+- Homepage with assessment CTA.
+- 13-question beginner assessment.
+- Style matching engine for Boxing, Muay Thai, Kickboxing, BJJ, Wrestling, Judo, Karate, Taekwondo, and MMA.
+- Three-month beginner roadmap.
+- Gamified dashboard with XP, streaks, levels, skill unlocks, and achievements.
+- Visual skill trees and weekly training plans.
+- Revenue-ready surfaces for AI Coach Premium, Local Gym Finder, Gear Store, Premium Membership, and Profile.
+- localStorage persistence for answers and progress.
