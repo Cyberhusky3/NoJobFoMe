@@ -1,34 +1,48 @@
-# NoJobFoMe Arena
+# FightFit AI
 
-A complete browser-based top-down shooter prototype built with vanilla HTML, CSS, and JavaScript.
+FightFit AI is a production-ready MVP for beginners who want to get fit and learn how to fight but do not know where to start. It combines a Duolingo-style assessment, martial arts style matching, gamified progress, visual skill trees, training plans, and mocked revenue surfaces for premium AI coaching, local gyms, and gear recommendations.
+
+## Tech Stack
+
+- Next.js 15
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- LocalStorage MVP persistence
+- Mock seed data
+- Mobile-first dark UI
 
 ## Features
 
-- WASD/arrow-key movement, mouse aiming, and hold-to-fire shooting.
-- Continuous enemy waves with basic, fast, and tank archetypes.
-- Difficulty scaling through larger enemy groups, increased health, and increased speed.
-- Health, healing pickups, XP, level progression, score, wave, and survival timer UI.
-- Character progression with persistent unlocks via `localStorage`:
-  - Starter Soldier: available immediately.
-  - Scout: unlocks at Level 3.
-  - Heavy Gunner: unlocks at Level 5.
-  - Medic: unlocks at Level 7.
-- Level-up weapon upgrades for fire rate, damage, and multi-shot.
-- Procedural Web Audio sound effects and canvas-based visual effects.
+- Landing page with the headline **Find Your Fighting Style.**
+- 13-question beginner assessment persisted to `localStorage`.
+- Style matching engine for Boxing, Muay Thai, Kickboxing, BJJ, Wrestling, Judo, Karate, Taekwondo, and MMA.
+- Match cards with percentage, reasons, learning curve, fitness benefits, self-defense score, and beginner friendliness.
+- Gamified dashboard with XP, streak, level, weekly goals, badges, and unlock states.
+- Visual skill trees for Boxing, BJJ, Muay Thai, and MMA.
+- Personalized weekly training plan with warmup, skill work, strength, conditioning, and recovery.
+- Revenue-ready mocked sections: AI Coach Premium, Local Gym Finder, Gear Store, Premium Membership.
+- Profile summary derived from assessment answers.
 
-## Running the Game
-
-Open `index.html` directly in a modern browser, or serve the folder locally:
+## Run Locally
 
 ```bash
-python3 -m http.server 8000
+npm install
+npm run dev
 ```
 
-Then visit <http://localhost:8000>.
+Open <http://localhost:3000>.
 
-## Controls
+## Production Build
 
-- Move: `WASD` or arrow keys
-- Aim: mouse
-- Shoot: hold left mouse button
-- Restart after defeat: use the Game Over screen button
+```bash
+npm run build
+npm start
+```
+
+## Project Structure
+
+- `src/app/page.tsx` renders the MVP shell.
+- `src/components/app.tsx` contains the client-side experience, assessment state, scoring UI, and premium modal.
+- `src/lib/data.ts` contains realistic seed data for styles, questions, skill trees, workouts, achievements, gear, and progress.
+- `src/app/globals.css` contains Tailwind globals and shared MVP utility classes.
